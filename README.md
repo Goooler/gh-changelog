@@ -1,7 +1,12 @@
 # gh-changelog
 
-A [GitHub CLI](https://cli.github.com/) extension to extract and parse release notes from changelog files
-(supporting [Keep a Changelog](https://keepachangelog.com/) and more) for GitHub Releases.
+A [GitHub CLI](https://cli.github.com/) extension to extract and parse release notes from changelog files for GitHub
+Releases.
+
+Supported formats:
+
+- [Keep a Changelog](https://keepachangelog.com/)
+- [Common Changelog](https://common-changelog.org/)
 
 ## Installation
 

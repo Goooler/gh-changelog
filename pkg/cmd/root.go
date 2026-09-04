@@ -19,7 +19,7 @@ func NewRootCmd(version string) *cobra.Command {
 		Use:   "gh-changelog [<version>]",
 		Short: "Extract release notes from changelog files",
 		Long: `gh-changelog is a GitHub CLI extension that parses release notes from changelog files
-(supporting Keep a Changelog and other markdown formats) and outputs them to RELEASE_NOTES.md.`,
+(supporting Keep a Changelog, Common Changelog, and other markdown formats) and outputs them to RELEASE_NOTES.md.`,
 		Version: version,
 		Example: `  # Extract topmost release notes to RELEASE_NOTES.md
   $ gh changelog extract
