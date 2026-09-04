@@ -7,9 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/text"
+	"github.com/yuin/goldmark/v2/ast"
+	"github.com/yuin/goldmark/v2/parser"
 )
 
 var (
@@ -69,8 +68,8 @@ func ExtractVersion(source []byte, targetVersion string, opts ExtractOptions) (R
 
 	targetVersion = strings.TrimSpace(targetVersion)
 
-	parser := goldmark.DefaultParser()
-	doc := parser.Parse(text.NewReader(source))
+	p := parser.New()
+	doc := p.Parse(source)
 
 	var targetHeading *ast.Heading
 	var targetHeadingIndex int
@@ -123,19 +122,19 @@ func ExtractVersion(source []byte, targetVersion string, opts ExtractOptions) (R
 
 	// Determine start offset
 	var startOffset int
-	lines := targetHeading.Lines()
-	if lines.Len() == 0 {
+	sourceSegments := targetHeading.Source()
+	if len(sourceSegments) == 0 {
 		return Result{}, fmt.Errorf("invalid heading structure in changelog")
 	}
 
 	if opts.IncludeHeader {
-		startOffset = lines.At(0).Start
+		startOffset = sourceSegments[0].Start
 		for startOffset > 0 && source[startOffset-1] != '\n' {
 			startOffset--
 		}
 	} else {
 		// Start immediately after the heading line
-		lastLine := lines.At(lines.Len() - 1)
+		lastLine := sourceSegments[len(sourceSegments)-1]
 		startOffset = lastLine.Stop
 		for startOffset < len(source) && source[startOffset] != '\n' {
 			startOffset++
@@ -152,8 +151,9 @@ func ExtractVersion(source []byte, targetVersion string, opts ExtractOptions) (R
 	for i := targetHeadingIndex + 1; i < len(children); i++ {
 		if h, ok := children[i].(*ast.Heading); ok {
 			if h.Level <= targetHeading.Level {
-				if h.Lines().Len() > 0 {
-					nextStart := h.Lines().At(0).Start
+				segs := h.Source()
+				if len(segs) > 0 {
+					nextStart := segs[0].Start
 					for nextStart > 0 && source[nextStart-1] != '\n' {
 						nextStart--
 					}
@@ -201,14 +201,9 @@ func headingText(h *ast.Heading, source []byte) string {
 		if entering {
 			switch node := n.(type) {
 			case *ast.Text:
-				sb.Write(node.Segment.Value(source))
-			case *ast.String:
-				sb.Write(node.Value)
+				sb.WriteString(node.Value.Value(source))
 			case *ast.CodeSpan:
-				for i := 0; i < node.Lines().Len(); i++ {
-					seg := node.Lines().At(i)
-					sb.Write(seg.Value(source))
-				}
+				sb.WriteString(node.Value.Value(source))
 			}
 		}
 		return ast.WalkContinue, nil
