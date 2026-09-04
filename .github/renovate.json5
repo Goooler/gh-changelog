@@ -3,4 +3,8 @@
   extends: [
     'github>goooler/renovate-config:default.json5',
   ],
+  postUpdateOptions: [
+    'gomodTidy',
+    'gomodUpdateImportPaths',
+  ],
 }
