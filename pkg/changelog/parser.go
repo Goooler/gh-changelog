@@ -201,9 +201,9 @@ func headingText(h *ast.Heading, source []byte) string {
 		if entering {
 			switch node := n.(type) {
 			case *ast.Text:
-				sb.WriteString(node.Value.Str(source))
+				sb.WriteString(node.Value.Value(source))
 			case *ast.CodeSpan:
-				sb.WriteString(node.Value.Str(source))
+				sb.WriteString(node.Value.Value(source))
 			}
 		}
 		return ast.WalkContinue, nil
