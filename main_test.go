@@ -15,7 +15,7 @@ func TestRootCommandVersion(t *testing.T) {
 		t.Fatalf("Execute() error = %v", err)
 	}
 
-	const want = "gh-extension-template version v1.2.3\n"
+	const want = "gh-changelog version v1.2.3\n"
 	if got := stdout.String(); got != want {
 		t.Fatalf("version output = %q, want %q", got, want)
 	}

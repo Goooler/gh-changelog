@@ -1,7 +1,7 @@
-# Copilot Instructions for gh-extension-template
+# Copilot Instructions for gh-changelog
 
 ## Project Overview
-This is a Go-based GitHub CLI extension that demonstrates best practices for building extensible CLI tools. The project uses the `gh` CLI extension framework and follows modern Go development patterns.
+This is a Go-based GitHub CLI extension that extracts and parses release notes from changelog files (such as Keep a Changelog) for GitHub Releases. The project uses the `gh` CLI extension framework and follows modern Go development patterns.
 
 ## Technology Stack
 - **Language**: Go

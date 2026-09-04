@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 
 # ── Change this to your extension name (without the gh- prefix) ──
-EXTENSION_NAME ?= extension-template
+EXTENSION_NAME ?= changelog
 
 BINARY ?= bin/gh-$(EXTENSION_NAME)
 GO ?= go

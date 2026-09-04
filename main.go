@@ -15,11 +15,11 @@ var version = "dev"
 
 func newRootCmd(commandVersion string) *cobra.Command {
 	return &cobra.Command{
-		Use:     "gh-extension-template",
-		Short:   "TODO: describe your extension",
+		Use:     "gh-changelog",
+		Short:   "Extract release notes from changelog files for GitHub Releases",
 		Version: commandVersion,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Fprintln(cmd.OutOrStdout(), "Hello from gh-extension-template! Replace this with your implementation.")
+			fmt.Fprintln(cmd.OutOrStdout(), "Hello from gh-changelog! Replace this with your implementation.")
 			return nil
 		},
 	}
