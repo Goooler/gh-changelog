@@ -72,7 +72,15 @@ test-race: check-go-version
 coverage:
 	$(GO) tool cover -func=coverage.out
 
-ci: check-go-version
+check-fmt:
+	@unformatted="$$(gofmt -l $$(find . -type f -name '*.go' -not -path './dist/*'))"; \
+	if [ -n "$$unformatted" ]; then \
+		echo "The following files need gofmt:"; \
+		echo "$$unformatted"; \
+		exit 1; \
+	fi
+
+ci: check-go-version check-fmt
 	$(GO) build ./... && $(GO) vet ./... && $(GO) test -v -race -coverprofile=coverage.out ./...
 
 release-check: check-go-version

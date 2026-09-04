@@ -296,4 +296,3 @@ func skipSetextUnderline(source []byte, offset int) int {
 	}
 	return offset
 }
-

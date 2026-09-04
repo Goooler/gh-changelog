@@ -16,8 +16,8 @@ func NewRootCmd(version string) *cobra.Command {
 	}
 
 	rootCmd := &cobra.Command{
-		Use:     "gh-changelog [<version>]",
-		Short:   "Extract release notes from changelog files",
+		Use:   "gh-changelog [<version>]",
+		Short: "Extract release notes from changelog files",
 		Long: `gh-changelog is a GitHub CLI extension that parses release notes from changelog files
 (supporting Keep a Changelog and other markdown formats) and outputs them to RELEASE_NOTES.md.`,
 		Version: version,
