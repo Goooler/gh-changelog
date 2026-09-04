@@ -36,49 +36,96 @@ func DefaultOptions() ExtractOptions {
 	}
 }
 
+// Result contains the extracted release notes and metadata.
+type Result struct {
+	Version string
+	Notes   string
+}
+
 // Extract parses the markdown changelog and extracts release notes for the target version.
+// If targetVersion is empty, it automatically extracts the topmost released version.
 func Extract(source []byte, targetVersion string) (string, error) {
-	return ExtractWithOptions(source, targetVersion, DefaultOptions())
+	res, err := ExtractVersion(source, targetVersion, DefaultOptions())
+	if err != nil {
+		return "", err
+	}
+	return res.Notes, nil
 }
 
 // ExtractWithOptions parses the markdown changelog with customized options.
 func ExtractWithOptions(source []byte, targetVersion string, opts ExtractOptions) (string, error) {
+	res, err := ExtractVersion(source, targetVersion, opts)
+	if err != nil {
+		return "", err
+	}
+	return res.Notes, nil
+}
+
+// ExtractVersion parses the markdown changelog and returns the Result.
+func ExtractVersion(source []byte, targetVersion string, opts ExtractOptions) (Result, error) {
 	if len(bytes.TrimSpace(source)) == 0 {
-		return "", ErrEmptyChangelog
+		return Result{}, ErrEmptyChangelog
 	}
 
 	targetVersion = strings.TrimSpace(targetVersion)
-	if targetVersion == "" {
-		return "", fmt.Errorf("target version cannot be empty")
-	}
 
 	parser := goldmark.DefaultParser()
 	doc := parser.Parse(text.NewReader(source))
 
-	// Find the heading corresponding to targetVersion
 	var targetHeading *ast.Heading
 	var targetHeadingIndex int
 	var children []ast.Node
 
+	var unreleasedHeading *ast.Heading
+	var unreleasedIndex int
+
 	for child := doc.FirstChild(); child != nil; child = child.NextSibling() {
 		children = append(children, child)
 		if h, ok := child.(*ast.Heading); ok {
-			if targetHeading == nil && matchesVersion(headingText(h, source), targetVersion) {
-				targetHeading = h
-				targetHeadingIndex = len(children) - 1
+			text := headingText(h, source)
+			if targetVersion != "" {
+				if targetHeading == nil && matchesVersion(text, targetVersion) {
+					targetHeading = h
+					targetHeadingIndex = len(children) - 1
+				}
+			} else {
+				// Automatic topmost version detection
+				if isDocumentTitle(text, h.Level) {
+					continue
+				}
+				if isUnreleased(text) {
+					if unreleasedHeading == nil {
+						unreleasedHeading = h
+						unreleasedIndex = len(children) - 1
+					}
+					continue
+				}
+				// Found the topmost released version
+				if targetHeading == nil {
+					targetHeading = h
+					targetHeadingIndex = len(children) - 1
+				}
 			}
 		}
 	}
 
 	if targetHeading == nil {
-		return "", fmt.Errorf("%w: %q", ErrVersionNotFound, targetVersion)
+		if targetVersion == "" && unreleasedHeading != nil {
+			targetHeading = unreleasedHeading
+			targetHeadingIndex = unreleasedIndex
+		} else {
+			if targetVersion == "" {
+				return Result{}, errors.New("no version headings found in changelog")
+			}
+			return Result{}, fmt.Errorf("%w: %q", ErrVersionNotFound, targetVersion)
+		}
 	}
 
 	// Determine start offset
 	var startOffset int
 	lines := targetHeading.Lines()
 	if lines.Len() == 0 {
-		return "", fmt.Errorf("invalid heading structure in changelog")
+		return Result{}, fmt.Errorf("invalid heading structure in changelog")
 	}
 
 	if opts.IncludeHeader {
@@ -127,7 +174,24 @@ func ExtractWithOptions(source []byte, targetVersion string, opts ExtractOptions
 		extracted = stripTrailingLinkDefinitions(extracted)
 	}
 
-	return strings.TrimSpace(extracted), nil
+	return Result{
+		Version: headingText(targetHeading, source),
+		Notes:   strings.TrimSpace(extracted),
+	}, nil
+}
+
+func isDocumentTitle(title string, level int) bool {
+	if level > 1 {
+		return false
+	}
+	cleaned := strings.ToLower(strings.TrimSpace(title))
+	return cleaned == "changelog" || cleaned == "change log" || cleaned == "release notes" || cleaned == "history" || cleaned == "releases"
+}
+
+func isUnreleased(title string) bool {
+	cleaned := strings.TrimSpace(title)
+	cleaned = strings.Trim(cleaned, "[]()")
+	return strings.EqualFold(cleaned, "unreleased")
 }
 
 // headingText extracts all text contents inside a heading node.

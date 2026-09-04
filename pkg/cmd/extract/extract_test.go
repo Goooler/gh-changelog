@@ -13,6 +13,9 @@ func TestExtractCommand(t *testing.T) {
 	changelogPath := filepath.Join(tempDir, "CHANGELOG.md")
 	content := `# Changelog
 
+## [Unreleased]
+- WIP feature
+
 ## [1.2.3] - 2024-05-01
 ### Added
 - Super feature
@@ -27,49 +30,10 @@ func TestExtractCommand(t *testing.T) {
 		t.Fatalf("failed to write test changelog: %v", err)
 	}
 
-	t.Run("extract from file to stdout", func(t *testing.T) {
-		var stdout bytes.Buffer
+	t.Run("default extracts topmost released version to default output file", func(t *testing.T) {
+		outputPath := filepath.Join(tempDir, "RELEASE_NOTES.md")
 		opts := &Options{
-			Version:       "v1.2.3",
-			ChangelogFile: changelogPath,
-			Out:           &stdout,
-		}
-
-		err := RunExtract(opts)
-		if err != nil {
-			t.Fatalf("RunExtract() failed: %v", err)
-		}
-
-		want := "### Added\n- Super feature\n\n### Fixed\n- Bug fix"
-		if got := strings.TrimSpace(stdout.String()); got != want {
-			t.Errorf("RunExtract() = %q, want %q", got, want)
-		}
-	})
-
-	t.Run("extract from stdin", func(t *testing.T) {
-		var stdout bytes.Buffer
-		opts := &Options{
-			Version:       "1.2.2",
-			ChangelogFile: "-",
-			In:            strings.NewReader(content),
-			Out:           &stdout,
-		}
-
-		err := RunExtract(opts)
-		if err != nil {
-			t.Fatalf("RunExtract() failed: %v", err)
-		}
-
-		want := "- Old fix"
-		if got := strings.TrimSpace(stdout.String()); got != want {
-			t.Errorf("RunExtract() = %q, want %q", got, want)
-		}
-	})
-
-	t.Run("extract to output file", func(t *testing.T) {
-		outputPath := filepath.Join(tempDir, "output.md")
-		opts := &Options{
-			Version:       "v1.2.3",
+			Version:       "",
 			ChangelogFile: changelogPath,
 			OutputFile:    outputPath,
 		}
@@ -87,6 +51,47 @@ func TestExtractCommand(t *testing.T) {
 		want := "### Added\n- Super feature\n\n### Fixed\n- Bug fix"
 		if got := strings.TrimSpace(string(data)); got != want {
 			t.Errorf("OutputFile content = %q, want %q", got, want)
+		}
+	})
+
+	t.Run("extract specific version to stdout via --stdout flag", func(t *testing.T) {
+		var stdout bytes.Buffer
+		opts := &Options{
+			Version:       "v1.2.3",
+			ChangelogFile: changelogPath,
+			Stdout:        true,
+			Out:           &stdout,
+		}
+
+		err := RunExtract(opts)
+		if err != nil {
+			t.Fatalf("RunExtract() failed: %v", err)
+		}
+
+		want := "### Added\n- Super feature\n\n### Fixed\n- Bug fix"
+		if got := strings.TrimSpace(stdout.String()); got != want {
+			t.Errorf("RunExtract() = %q, want %q", got, want)
+		}
+	})
+
+	t.Run("extract from stdin to stdout", func(t *testing.T) {
+		var stdout bytes.Buffer
+		opts := &Options{
+			Version:       "1.2.2",
+			ChangelogFile: "-",
+			OutputFile:    "-",
+			In:            strings.NewReader(content),
+			Out:           &stdout,
+		}
+
+		err := RunExtract(opts)
+		if err != nil {
+			t.Fatalf("RunExtract() failed: %v", err)
+		}
+
+		want := "- Old fix"
+		if got := strings.TrimSpace(stdout.String()); got != want {
+			t.Errorf("RunExtract() = %q, want %q", got, want)
 		}
 	})
 

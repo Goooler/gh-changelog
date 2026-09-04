@@ -10,12 +10,37 @@ gh extension install Goooler/gh-changelog
 
 ## Usage
 
-```bash
-# Extract release notes for a specific version/tag
-gh changelog extract v1.0.0 --file CHANGELOG.md
+### In GitHub Actions (CI)
 
-# Create or update a GitHub release with release notes extracted from changelog
-gh changelog release v1.0.0 --file CHANGELOG.md
+Replace third-party extraction actions with `gh changelog`:
+
+```yaml
+- name: Extract release notes
+  run: |
+    gh extension install Goooler/gh-changelog
+    gh changelog
+
+- name: Create release
+  run: gh release create ${{ github.ref_name }} --notes-file RELEASE_NOTES.md
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### CLI Commands
+
+```bash
+# Extract topmost release notes to RELEASE_NOTES.md (default)
+gh changelog
+
+# Extract specific version to RELEASE_NOTES.md
+gh changelog v1.2.3
+
+# Print release notes to stdout
+gh changelog --stdout
+gh changelog v1.2.3 --stdout
+
+# Custom input changelog and output file
+gh changelog v1.2.3 --file docs/CHANGELOG.md --output custom_notes.md
 ```
 
 ## Development

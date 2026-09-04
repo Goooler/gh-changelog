@@ -15,6 +15,7 @@ type Options struct {
 	ChangelogFile string
 	IncludeHeader bool
 	OutputFile    string
+	Stdout        bool
 
 	In  io.Reader
 	Out io.Writer
@@ -30,34 +31,42 @@ func NewCmdExtract() *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:     "extract <version>",
+		Use:     "extract [<version>]",
 		Aliases: []string{"view", "get", "parse"},
-		Short:   "Extract release notes for a version from a changelog file",
-		Long: `Extract and print the release notes for a specified version from a changelog file.
+		Short:   "Extract release notes from a changelog file",
+		Long: `Extract release notes for a specified version (or the topmost released version by default)
+from a changelog file and save to RELEASE_NOTES.md (or stdout with --stdout).
 
-By default, it searches ./CHANGELOG.md and prints the extracted markdown to stdout.
-Use '-' as the file path to read the changelog from standard input.`,
-		Example: `  # Extract notes for v1.2.3 from CHANGELOG.md
-  $ gh changelog extract v1.2.3
+By default, it searches ./CHANGELOG.md and writes to ./RELEASE_NOTES.md.
+Use '-' as the changelog file path to read from standard input.`,
+		Example: `  # Extract topmost release notes to RELEASE_NOTES.md
+  $ gh changelog
 
-  # Extract from a custom changelog file
-  $ gh changelog extract 1.2.3 --file docs/CHANGELOG.md
+  # Extract specific version to RELEASE_NOTES.md
+  $ gh changelog v1.2.3
 
-  # Extract unreleased changes
-  $ gh changelog extract unreleased
+  # Extract to stdout instead of file
+  $ gh changelog --stdout
+  $ gh changelog v1.2.3 --stdout
 
-  # Read from stdin and save to a file
-  $ cat CHANGELOG.md | gh changelog extract v1.2.3 -f - -o release_notes.md`,
-		Args: cobra.ExactArgs(1),
+  # Extract from a custom changelog file to a custom output file
+  $ gh changelog v1.2.3 --file docs/CHANGELOG.md --output notes.md
+
+  # Read from stdin and print to stdout
+  $ cat CHANGELOG.md | gh changelog -f - --stdout`,
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			opts.Version = args[0]
+			if len(args) > 0 {
+				opts.Version = args[0]
+			}
 			return RunExtract(opts)
 		},
 	}
 
 	cmd.Flags().StringVarP(&opts.ChangelogFile, "file", "f", "CHANGELOG.md", "Path to changelog file (use \"-\" to read from standard input)")
+	cmd.Flags().StringVarP(&opts.OutputFile, "output", "o", "RELEASE_NOTES.md", "Path to output file (use \"-\" to print to standard output)")
+	cmd.Flags().BoolVar(&opts.Stdout, "stdout", false, "Print extracted release notes to standard output")
 	cmd.Flags().BoolVarP(&opts.IncludeHeader, "header", "H", false, "Include version heading in output")
-	cmd.Flags().StringVarP(&opts.OutputFile, "output", "o", "", "Write extracted release notes to file instead of stdout")
 
 	return cmd
 }
@@ -92,13 +101,14 @@ func RunExtract(opts *Options) error {
 		return err
 	}
 
-	if opts.OutputFile != "" {
-		if err := os.WriteFile(opts.OutputFile, []byte(notes+"\n"), 0644); err != nil {
-			return fmt.Errorf("failed to write output file %s: %w", opts.OutputFile, err)
-		}
+	if opts.Stdout || opts.OutputFile == "-" || opts.OutputFile == "" {
+		fmt.Fprintln(opts.Out, notes)
 		return nil
 	}
 
-	fmt.Fprintln(opts.Out, notes)
+	if err := os.WriteFile(opts.OutputFile, []byte(notes+"\n"), 0644); err != nil {
+		return fmt.Errorf("failed to write output file %s: %w", opts.OutputFile, err)
+	}
+
 	return nil
 }

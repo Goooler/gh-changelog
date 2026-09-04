@@ -4,6 +4,7 @@ bin/
 *.exe
 dist/
 coverage.out
+RELEASE_NOTES.md
 
 # IDE
 .idea/

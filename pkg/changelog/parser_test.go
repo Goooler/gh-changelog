@@ -44,6 +44,32 @@ func TestExtract(t *testing.T) {
 - Bug X`,
 		},
 		{
+			name: "auto-detect topmost released version when targetVersion is empty",
+			changelog: `# Changelog
+## [Unreleased]
+- Ongoing work
+
+## [1.1.1] - 2024-05-01
+### Added
+- Feature A
+
+## [1.1.0] - 2024-04-01
+- Older feature
+`,
+			targetVersion: "",
+			want: `### Added
+- Feature A`,
+		},
+		{
+			name: "auto-detect topmost version when only unreleased exists",
+			changelog: `# Changelog
+## [Unreleased]
+- Ongoing work
+`,
+			targetVersion: "",
+			want:          "- Ongoing work",
+		},
+		{
 			name: "standard keep a changelog without v prefix",
 			changelog: `# Changelog
 ## [1.1.1] - 2024-05-01

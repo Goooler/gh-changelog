@@ -3,7 +3,6 @@ module github.com/Goooler/gh-changelog
 go 1.25.0
 
 require (
-	github.com/cli/safeexec v1.0.1
 	github.com/spf13/cobra v1.10.2
 	github.com/yuin/goldmark v1.8.6
 )
