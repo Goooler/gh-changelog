@@ -1,32 +1,48 @@
-# gh-extension-template
+# gh-changelog
 
-A template for building [GitHub CLI](https://cli.github.com/) extensions in Go.
+A [GitHub CLI](https://cli.github.com/) extension to extract and parse release notes from changelog files
+(supporting [Keep a Changelog](https://keepachangelog.com/) and more) for GitHub Releases.
 
-## Using this template
+## Installation
 
-1. Create a new repo from this template:
-   ```bash
-   gh repo create my-org/gh-my-extension --template maxbeizer/gh-extension-template --private --clone
-   cd gh-my-extension
-   ```
+```bash
+gh extension install Goooler/gh-changelog
+```
 
-2. Customize the generated repository:
-   - **`go.mod`** — change the module path to your repository.
-   - **`Makefile`** — change `EXTENSION_NAME` to the extension name without the `gh-` prefix.
-   - **`.goreleaser.yml`** — change `project_name` and `binary` to `gh-<your-name>`, and confirm the `main.version` ldflag still matches your version variable.
-   - **`main.go` and `main_test.go`** — change the command name, description, placeholder output, and expected version output, then implement your commands while retaining `--version` support.
-   - **`README.md`** and the GitHub repository description — describe the extension and its installation and usage.
-   - **`CHANGELOG.md`** — replace the comparison-link placeholders and maintain release entries.
-   - **`.github/copilot-instructions.md`** — replace template-specific names and adjust the guidance to the project.
-   - **`CODE_OF_CONDUCT.md`** — provide a private conduct-reporting channel owned by the project maintainers.
+## Usage
 
-3. Verify the starter behavior:
-   ```bash
-   make ci
-   make install-local
-   gh my-extension
-   gh my-extension --version
-   ```
+### In GitHub Actions (CI)
+
+Replace third-party extraction actions with `gh changelog extract`:
+
+```yaml
+- name: Extract release notes
+  run: |
+    gh extension install Goooler/gh-changelog
+    gh changelog extract
+
+- name: Create release
+  run: gh release create ${{ github.ref_name }} --notes-file RELEASE_NOTES.md
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### CLI Commands
+
+```bash
+# Extract topmost release notes to RELEASE_NOTES.md (default)
+gh changelog extract
+
+# Extract specific version to RELEASE_NOTES.md
+gh changelog extract v1.2.3
+
+# Print release notes to stdout
+gh changelog extract --stdout
+gh changelog extract v1.2.3 --stdout
+
+# Custom input changelog and output file
+gh changelog extract v1.2.3 --file docs/CHANGELOG.md --output custom_notes.md
+```
 
 ## Development
 
@@ -45,10 +61,6 @@ changes, runs CI and vulnerability scanning, validates the GoReleaser config,
 and creates a clean local snapshot in `dist/`. It does not tag, publish, or
 create a GitHub release. Install a current GoReleaser v2 binary before running
 it.
-
-The starter command prints a placeholder greeting. Cobra provides `--help`,
-and `--version` prints `dev` for ordinary local builds or the release tag for
-GoReleaser builds.
 
 ## Releasing
 
@@ -72,16 +84,16 @@ binaries plus checksums for all six supported targets:
 Once released, users install with:
 
 ```bash
-gh extension install my-org/gh-my-extension
+gh extension install Goooler/gh-changelog
 ```
 
 ## What's included
 
-| File | Purpose |
-|------|---------|
-| `Makefile` | Build, test, lint, install, and release-preflight targets |
-| `.goreleaser.yml` | Cross-platform standalone binary releases |
-| `.github/workflows/release.yml` | Validated automated releases on tag push |
-| `.github/workflows/ci.yml` | CI on pushes and pull requests to `main` |
-| `main.go` | Minimal Cobra starter with version and signal handling |
-| `.gitignore` | Go, editor, and OS ignores |
+| File                            | Purpose                                                   |
+|---------------------------------|-----------------------------------------------------------|
+| `Makefile`                      | Build, test, lint, install, and release-preflight targets |
+| `.goreleaser.yml`               | Cross-platform standalone binary releases                 |
+| `.github/workflows/release.yml` | Validated automated releases on tag push                  |
+| `.github/workflows/ci.yml`      | CI on pushes and pull requests to `main`                  |
+| `main.go`                       | Cobra CLI implementation with version and signal handling |
+| `.gitignore`                    | Go, editor, and OS ignores                                |

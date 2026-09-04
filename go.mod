@@ -1,8 +1,11 @@
-module github.com/maxbeizer/gh-extension-template
+module github.com/Goooler/gh-changelog
 
-go 1.24.13
+go 1.25.0
 
-require github.com/spf13/cobra v1.10.2
+require (
+	github.com/spf13/cobra v1.10.2
+	github.com/yuin/goldmark v1.8.6
+)
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
