@@ -107,6 +107,40 @@ func TestExtract(t *testing.T) {
 			want:          "- Major rewrite",
 		},
 		{
+			name: "common changelog format with notice, change categories, and reference links",
+			changelog: `# Changelog
+
+## [2.0.0] - 2020-07-23
+
+_If you are upgrading: please see [` + "`UPGRADING.md`" + `](UPGRADING.md)._
+
+### Removed
+
+- **Breaking:** remove ` + "`write()`" + ` method from public API ([` + "`01e3a64`" + `](https://github.com/level/level/commit/01e3a64))
+
+### Changed
+
+- Upgrade ` + "`abstract-level`" + ` from ` + "`~1.0.0`" + ` to ` + "`~2.0.0`" + ` ([#123](https://github.com/level/level/issues/123))
+
+## [1.0.0] - 2019-08-23
+
+_First release._
+
+[2.0.0]: https://github.com/level/level/releases/tag/v2.0.0
+[1.0.0]: https://github.com/level/level/releases/tag/v1.0.0
+`,
+			targetVersion: "2.0.0",
+			want: `_If you are upgrading: please see [` + "`UPGRADING.md`" + `](UPGRADING.md)._
+
+### Removed
+
+- **Breaking:** remove ` + "`write()`" + ` method from public API ([` + "`01e3a64`" + `](https://github.com/level/level/commit/01e3a64))
+
+### Changed
+
+- Upgrade ` + "`abstract-level`" + ` from ` + "`~1.0.0`" + ` to ` + "`~2.0.0`" + ` ([#123](https://github.com/level/level/issues/123))`,
+		},
+		{
 			name: "headings with Release prefix",
 			changelog: `# Changelog
 ## Release 3.0.0
