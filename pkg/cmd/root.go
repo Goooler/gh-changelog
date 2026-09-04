@@ -22,17 +22,17 @@ func NewRootCmd(version string) *cobra.Command {
 (supporting Keep a Changelog and other markdown formats) and outputs them to RELEASE_NOTES.md.`,
 		Version: version,
 		Example: `  # Extract topmost release notes to RELEASE_NOTES.md
-  $ gh changelog
+  $ gh changelog extract
 
   # Extract specific version to RELEASE_NOTES.md
-  $ gh changelog v1.2.3
+  $ gh changelog extract v1.2.3
 
   # Extract to stdout instead of file
-  $ gh changelog --stdout
-  $ gh changelog v1.2.3 --stdout
+  $ gh changelog extract --stdout
+  $ gh changelog extract v1.2.3 --stdout
 
   # Extract from a custom changelog file to a custom output file
-  $ gh changelog v1.2.3 --file docs/CHANGELOG.md --output notes.md`,
+  $ gh changelog extract v1.2.3 --file docs/CHANGELOG.md --output notes.md`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {

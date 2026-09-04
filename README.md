@@ -12,13 +12,13 @@ gh extension install Goooler/gh-changelog
 
 ### In GitHub Actions (CI)
 
-Replace third-party extraction actions with `gh changelog`:
+Replace third-party extraction actions with `gh changelog extract`:
 
 ```yaml
 - name: Extract release notes
   run: |
     gh extension install Goooler/gh-changelog
-    gh changelog
+    gh changelog extract
 
 - name: Create release
   run: gh release create ${{ github.ref_name }} --notes-file RELEASE_NOTES.md
@@ -30,17 +30,17 @@ Replace third-party extraction actions with `gh changelog`:
 
 ```bash
 # Extract topmost release notes to RELEASE_NOTES.md (default)
-gh changelog
+gh changelog extract
 
 # Extract specific version to RELEASE_NOTES.md
-gh changelog v1.2.3
+gh changelog extract v1.2.3
 
 # Print release notes to stdout
-gh changelog --stdout
-gh changelog v1.2.3 --stdout
+gh changelog extract --stdout
+gh changelog extract v1.2.3 --stdout
 
 # Custom input changelog and output file
-gh changelog v1.2.3 --file docs/CHANGELOG.md --output custom_notes.md
+gh changelog extract v1.2.3 --file docs/CHANGELOG.md --output custom_notes.md
 ```
 
 ## Development
