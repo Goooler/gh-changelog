@@ -2,28 +2,15 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/spf13/cobra"
+	"github.com/Goooler/gh-changelog/pkg/cmd"
 )
 
 var version = "dev"
-
-func newRootCmd(commandVersion string) *cobra.Command {
-	return &cobra.Command{
-		Use:     "gh-changelog",
-		Short:   "Extract release notes from changelog files for GitHub Releases",
-		Version: commandVersion,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Fprintln(cmd.OutOrStdout(), "Hello from gh-changelog! Replace this with your implementation.")
-			return nil
-		},
-	}
-}
 
 func main() {
 	userMessages := log.New(os.Stderr, "", 0)
@@ -44,7 +31,7 @@ func main() {
 		}
 	}()
 
-	if err := newRootCmd(version).ExecuteContext(ctx); err != nil {
+	if err := cmd.NewRootCmd(version).ExecuteContext(ctx); err != nil {
 		userMessages.Printf("error: %v", err)
 		os.Exit(1)
 	}

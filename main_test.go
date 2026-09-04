@@ -3,15 +3,17 @@ package main
 import (
 	"bytes"
 	"testing"
+
+	"github.com/Goooler/gh-changelog/pkg/cmd"
 )
 
 func TestRootCommandVersion(t *testing.T) {
 	var stdout bytes.Buffer
-	cmd := newRootCmd("v1.2.3")
-	cmd.SetOut(&stdout)
-	cmd.SetArgs([]string{"--version"})
+	rootCmd := cmd.NewRootCmd("v1.2.3")
+	rootCmd.SetOut(&stdout)
+	rootCmd.SetArgs([]string{"--version"})
 
-	if err := cmd.Execute(); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		t.Fatalf("Execute() error = %v", err)
 	}
 
