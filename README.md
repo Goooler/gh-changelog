@@ -1,6 +1,7 @@
 # gh-changelog
 
-A [GitHub CLI](https://cli.github.com/) extension to extract and parse release notes from changelog files (supporting [Keep a Changelog](https://keepachangelog.com/) and more) for GitHub Releases.
+A [GitHub CLI](https://cli.github.com/) extension to extract and parse release notes from changelog files
+(supporting [Keep a Changelog](https://keepachangelog.com/) and more) for GitHub Releases.
 
 ## Installation
 
@@ -88,11 +89,11 @@ gh extension install Goooler/gh-changelog
 
 ## What's included
 
-| File | Purpose |
-|------|---------|
-| `Makefile` | Build, test, lint, install, and release-preflight targets |
-| `.goreleaser.yml` | Cross-platform standalone binary releases |
-| `.github/workflows/release.yml` | Validated automated releases on tag push |
-| `.github/workflows/ci.yml` | CI on pushes and pull requests to `main` |
-| `main.go` | Cobra CLI implementation with version and signal handling |
-| `.gitignore` | Go, editor, and OS ignores |
+| File                            | Purpose                                                   |
+|---------------------------------|-----------------------------------------------------------|
+| `Makefile`                      | Build, test, lint, install, and release-preflight targets |
+| `.goreleaser.yml`               | Cross-platform standalone binary releases                 |
+| `.github/workflows/release.yml` | Validated automated releases on tag push                  |
+| `.github/workflows/ci.yml`      | CI on pushes and pull requests to `main`                  |
+| `main.go`                       | Cobra CLI implementation with version and signal handling |
+| `.gitignore`                    | Go, editor, and OS ignores                                |
