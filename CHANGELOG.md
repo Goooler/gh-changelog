@@ -13,5 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 
 - Initial release
 
-[Unreleased]: https://github.com/Goooler/gh-changelog/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/Goooler/gh-changelog/releases/tag/v0.1.0
+
+
+[Unreleased]: https://github.com/Goooler/gh-changelog/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/Goooler/gh-changelog/releases/tag/0.1.0
