@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/spf13/cobra v1.10.2
-	github.com/yuin/goldmark/v2 v2.1.0
+	github.com/yuin/goldmark/v2 v2.1.1
 )
 
 require (
